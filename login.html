@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Masuk - KantekGO</title>
+  <style>
+    body{font-family:Inter,Arial,sans-serif;margin:0;background:#fbf6f0;color:#111}
+    .wrap{max-width:420px;margin:60px auto;padding:20px}
+    .card{background:#fff;padding:20px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.06)}
+    input{width:100%;padding:10px;margin:8px 0;border:1px solid #ddd;border-radius:8px}
+    button{padding:10px 14px;border:none;background:#7fb36b;color:#fff;border-radius:8px;cursor:pointer}
+    .alternate{margin-top:12px;color:#555;font-size:.95rem}
+    a.link{color:#f2994a;text-decoration:none;margin-left:6px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h2>Masuk</h2>
+      <p>Masuk untuk melihat status pesanan atau memesan.</p>
+
+      <label for="email">Email</label>
+      <input id="email" type="email" placeholder="email@contoh.com">
+
+      <label for="password">Password</label>
+      <input id="password" type="password" placeholder="Password">
+
+      <div style="margin-top:12px">
+        <button id="loginBtn">Masuk</button>
+      </div>
+
+      <div class="alternate">
+        Belum punya akun? <a class="link" href="signup.html">Daftar</a>
+      </div>
+
+      <div id="msg" style="margin-top:10px;color:red"></div>
+    </div>
+  </div>
+
+  <script>
+    // util: parse possible return param in query string
+    function getReturnUrl() {
+      const params = new URLSearchParams(location.search);
+      const r = params.get('return');
+      // if return param itself contains ?, decode it
+      return r ? decodeURIComponent(r) : 'index.html';
+    }
+
+    function showMsg(t) {
+      document.getElementById('msg').textContent = t;
+    }
+
+    document.getElementById('loginBtn').addEventListener('click', ()=>{
+      const email = (document.getElementById('email').value || '').trim().toLowerCase();
+      const pw = document.getElementById('password').value || '';
+
+      if (!email || !pw) { showMsg('Isi email dan password.'); return; }
+
+      // ambil user list
+      let users = [];
+      try { users = JSON.parse(localStorage.getItem('users') || '[]'); } catch(e) { users = []; }
+
+      const found = users.find(u => u.email === email && u.password === pw);
+      if (!found) { showMsg('Email atau password salah.'); return; }
+
+      // set current user (tanpa password untuk safer UI)
+      const current = { name: found.name, email: found.email };
+      localStorage.setItem('currentUser', JSON.stringify(current));
+
+      // redirect ke return url (jika ada)
+      const ret = getReturnUrl();
+      location.href = ret;
+    });
+
+    // Jika user sudah login -> langsung redirect
+    try {
+      const cur = JSON.parse(localStorage.getItem('currentUser'));
+      if (cur && cur.email) {
+        const ret = getReturnUrl();
+        location.href = ret;
+      }
+    } catch(e){}
+  </script>
+</body>
+</html>

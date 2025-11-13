@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title id="title">Status Pesanan</title>
+  <style>
+    body{font-family:Inter,Arial,sans-serif;margin:0;background:#fff;color:#111}
+    .wrap{max-width:900px;margin:40px auto;padding:20px}
+    .card{background:#f9f9f9;padding:20px;border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,.04)}
+    button.btn{padding:8px 12px;border-radius:8px;border:none;background:#f2994a;color:#fff;cursor:pointer}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1 id="heading">Status Pesanan</h1>
+    <div class="card" id="content">
+      <p>Memuat informasi pesanan...</p>
+    </div>
+    <div style="margin-top:18px">
+      <a href="index.html">Kembali ke Beranda</a>
+    </div>
+  </div>
+
+  <script>
+    // PROTEKSI HALAMAN: jika belum login -> redirect ke login.html (simpan return url)
+    (function(){
+      try {
+        const cur = JSON.parse(localStorage.getItem('currentUser'));
+        if (!cur || !cur.email) {
+          const ret = encodeURIComponent(location.pathname + location.search);
+          location.href = 'login.html?return=' + ret;
+        } else {
+          // tampilkan nama pengguna di judul
+          const h1 = document.getElementById('heading');
+          if (h1) h1.textContent = 'Status Pesanan — ' + cur.name;
+
+          // tampilkan info sample berdasarkan query param gerai
+          const params = new URLSearchParams(location.search);
+          const gerai = params.get('gerai') || '1';
+          const content = document.getElementById('content');
+          content.innerHTML = `
+            <p><strong>Nama:</strong> ${cur.name} (${cur.email})</p>
+            <p><strong>Gerai:</strong> ${gerai}</p>
+            <p><strong>Status:</strong> Pesanan diterima, sedang diproses.</p>
+            <p><small>Ini hanya demo. Untuk produksi gunakan backend & database.</small></p>
+            <div style="margin-top:12px">
+              <button class="btn" onclick="logout()">Logout</button>
+            </div>
+          `;
+        }
+      } catch (e) { location.href = 'login.html?return=' + encodeURIComponent(location.pathname + location.search); }
+    })();
+
+    function logout() {
+      localStorage.removeItem('currentUser');
+      location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>
